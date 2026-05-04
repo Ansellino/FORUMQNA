@@ -1,25 +1,18 @@
-import { Entity, PrimaryGeneratedColumn, Column,
-         CreateDateColumn, UpdateDateColumn, ManyToOne } from 'typeorm';
-import { User } from '../users/user.entity';
- 
-@Entity('threads')
-export class Thread {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
- 
-  @Column()
-  title: string;
- 
-  @Column('text')
-  content: string;
- 
-  @CreateDateColumn()
-  created_at: Date;
- 
-  @UpdateDateColumn()
-  updated_at: Date;
- 
-  // eager:true = user data otomatis di-load saat query thread
-  @ManyToOne(() => User, (user) => user.threads, { eager: true })
-  user: User;
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsString, MinLength } from 'class-validator';
+
+export class RegisterDto {
+  @ApiProperty({ example: 'johndoe' })
+  @IsString()
+  @MinLength(3)
+  username: string;
+
+  @ApiProperty({ example: 'johndoe@example.com' })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({ example: 'password123', minLength: 6 })
+  @IsString()
+  @MinLength(6)
+  password: string;
 }

@@ -5,6 +5,10 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 @ApiTags('App')
 @Controller()
 export class AppController {
+  getHello() {
+    return 'Hello World!';
+  }
+
   @Get()
   @ApiOperation({ summary: 'Health check' })
   getStatus() {
