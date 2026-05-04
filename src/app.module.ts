@@ -12,14 +12,13 @@ import { ThreadsModule } from './threads/threads.module';
     ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT) || 5432,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      url: process.env.DATABASE_URL,
       entities: [User, Thread],
-      synchronize: true, // Dev only - auto-create tables
-      ssl: { rejectUnauthorized: false }, // Required for Supabase
+      synchronize: process.env.NODE_ENV === 'development',
+      ssl: {
+        rejectUnauthorized: false,
+      },
+      logging: true,
     }),
     UsersModule,
     AuthModule,
