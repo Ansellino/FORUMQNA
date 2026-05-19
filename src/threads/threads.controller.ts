@@ -25,6 +25,7 @@ import { IsString, MinLength } from 'class-validator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ThreadsService } from './threads.service';
 import { ApiResponseDto } from '../common/dto/api-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { Thread } from './thread.entity';
 
 export class CreateThreadDto {
@@ -37,11 +38,13 @@ export class CreateThreadDto {
   @MinLength(10)
   content: string;
 }
+
 @ApiTags('Threads')
 @ApiExtraModels(ApiResponseDto, Thread)
 @Controller('threads')
 export class ThreadsController {
   constructor(private svc: ThreadsService) {}
+
   @Get()
   @ApiOperation({ summary: 'Get all threads' })
   @ApiOkResponse({
@@ -67,6 +70,7 @@ export class ThreadsController {
       meta: { total: threads.length },
     };
   }
+
   @Get('my-threads')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -84,7 +88,16 @@ export class ThreadsController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
   async mine(@Request() req) {
     const threads = await this.svc.findByUser(req.user.userId);
 
@@ -95,6 +108,7 @@ export class ThreadsController {
       meta: { total: threads.length },
     };
   }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get thread by ID' })
   @ApiOkResponse({
@@ -106,7 +120,16 @@ export class ThreadsController {
       },
     },
   })
-  @ApiResponse({ status: 404, description: 'Thread tidak ditemukan' })
+  @ApiResponse({
+    status: 404,
+    description: 'Thread tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Thread tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async findOne(@Param('id') id: string) {
     const thread = await this.svc.findOne(id);
 
@@ -116,6 +139,7 @@ export class ThreadsController {
       data: thread,
     };
   }
+
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -129,8 +153,29 @@ export class ThreadsController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Input tidak valid' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 400,
+    description: 'Input tidak valid (title atau content terlalu pendek)',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 400,
+      message: [
+        'title must be longer than or equal to 5 characters',
+        'content must be longer than or equal to 10 characters',
+      ],
+      error: 'Bad Request',
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
   async create(@Body() dto: CreateThreadDto, @Request() req) {
     const thread = await this.svc.create(dto, req.user.userId);
 
@@ -154,9 +199,49 @@ export class ThreadsController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Bukan pemilik thread' })
-  @ApiResponse({ status: 404, description: 'Thread tidak ditemukan' })
+  @ApiResponse({
+    status: 400,
+    description: 'Input tidak valid (title atau content terlalu pendek)',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 400,
+      message: [
+        'title must be longer than or equal to 5 characters',
+        'content must be longer than or equal to 10 characters',
+      ],
+      error: 'Bad Request',
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Bukan pemilik thread',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 403,
+      message: 'Bukan pemilik thread',
+      error: 'Forbidden',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Thread tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Thread tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async update(
     @Param('id') id: string,
     @Body() dto: CreateThreadDto,
@@ -185,14 +270,43 @@ export class ThreadsController {
       properties: {
         data: {
           type: 'object',
-          example: { message: 'Thread berhasil dihapus' },
+          properties: {
+            message: { type: 'string', example: 'Thread berhasil dihapus' },
+          },
         },
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Bukan pemilik thread' })
-  @ApiResponse({ status: 404, description: 'Thread tidak ditemukan' })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Bukan pemilik thread',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 403,
+      message: 'Bukan pemilik thread',
+      error: 'Forbidden',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Thread tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Thread tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async remove(@Param('id') id: string, @Request() req) {
     const t = await this.svc.findOne(id);
     if (t.user.id !== req.user.userId)

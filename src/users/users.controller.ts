@@ -5,6 +5,7 @@ import {
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { ApiResponseDto } from '../common/dto/api-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { PublicUserDto } from './dto/public-user.dto';
 
 @ApiTags('Users')
@@ -22,7 +23,16 @@ export class UsersController {
       properties: { data: { $ref: getSchemaPath(PublicUserDto) } },
     },
   })
-  @ApiResponse({ status: 404, description: 'User tidak ditemukan' })
+  @ApiResponse({
+    status: 404,
+    description: 'User tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'User tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async findOne(@Param('id') id: string) {
     const profile = await this.usersService.getPublicProfile(id);
     if (!profile) throw new NotFoundException('User tidak ditemukan');

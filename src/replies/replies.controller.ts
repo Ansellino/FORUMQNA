@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RepliesService } from './replies.service';
 import { CreateReplyDto } from './dto/create-reply.dto';
 import { ApiResponseDto } from '../common/dto/api-response.dto';
+import { ErrorResponseDto } from '../common/dto/error-response.dto';
 import { Reply } from './reply.entity';
 
 @ApiTags('Replies')
@@ -27,8 +28,18 @@ export class RepliesController {
       allOf: [{ $ref: getSchemaPath(ApiResponseDto) }],
       properties: {
         data: { type: 'array', items: { $ref: getSchemaPath(Reply) } },
-        meta: { type: 'object', properties: { total: { type: 'number' } } },
+        meta: { type: 'object', properties: { total: { type: 'number', example: 5 } } },
       },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Thread tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Thread tidak ditemukan',
+      error: 'Not Found',
     },
   })
   async findAll(@Param('threadId') threadId: string) {
@@ -47,8 +58,36 @@ export class RepliesController {
       properties: { data: { $ref: getSchemaPath(Reply) } },
     },
   })
-  @ApiResponse({ status: 400, description: 'Input tidak valid' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 400,
+    description: 'Input tidak valid (content terlalu pendek)',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 400,
+      message: ['content must be longer than or equal to 1 characters'],
+      error: 'Bad Request',
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Thread tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Thread tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async create(
     @Param('threadId') threadId: string,
     @Body() dto: CreateReplyDto,
@@ -62,10 +101,50 @@ export class RepliesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a reply (owner only)' })
-  @ApiOkResponse({ description: 'Reply berhasil dihapus' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Bukan pemilik reply' })
-  @ApiResponse({ status: 404, description: 'Reply tidak ditemukan' })
+  @ApiOkResponse({
+    description: 'Reply berhasil dihapus',
+    schema: {
+      allOf: [{ $ref: getSchemaPath(ApiResponseDto) }],
+      properties: {
+        data: {
+          type: 'object',
+          properties: {
+            message: { type: 'string', example: 'Reply berhasil dihapus' },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Token tidak ada atau tidak valid',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 401,
+      message: 'Unauthorized',
+      error: 'Unauthorized',
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Bukan pemilik reply',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 403,
+      message: 'Bukan pemilik reply',
+      error: 'Forbidden',
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Reply tidak ditemukan',
+    type: ErrorResponseDto,
+    example: {
+      statusCode: 404,
+      message: 'Reply tidak ditemukan',
+      error: 'Not Found',
+    },
+  })
   async remove(@Param('id') id: string, @Request() req) {
     const result = await this.svc.remove(id, req.user.userId);
     return { success: true, message: result.message, data: result };

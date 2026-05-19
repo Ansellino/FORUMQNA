@@ -53,6 +53,17 @@ npm run start:prod
 API base path: `http://localhost:3000/api`
 Swagger docs: `http://localhost:3000/api/docs`
 
+## Screenshot
+
+![Screenshot of Swagger UI showing API documentation](images/image.png)
+![Screenshot of GET request /api/users/{id}](images/image1.png)
+![Screenshot of POST request /api/auth/register](images/image2.png)
+![Screenshot of POST request /api/auth/login](images/image3.png)
+![Screenshot of GET request /api/threads](images/image4.png)
+![Screenshot of POST request /api/threads](images/image5.png)
+![Screenshot of GET request /api/threads/my-threads](images/image6.png) 
+![Screenshot of GET request /api/threads/{id}](images/image7.png)
+
 ## Useful scripts
 
 ```bash
