@@ -53,6 +53,75 @@ npm run start:prod
 API base path: `http://localhost:3000/api`
 Swagger docs: `http://localhost:3000/api/docs`
 
+## API documentation
+
+All endpoints return a common response envelope:
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {},
+  "meta": {}
+}
+```
+
+For protected routes, send `Authorization: Bearer <JWT>` in the header.
+
+### Authentication
+
+- `POST /auth/register`  
+  Create a new account with `username` (min 3), `email`, and `password` (min 6). Returns the new `userId` and a success message.  
+  Common errors: `400` invalid input, `409` email already registered.
+
+- `POST /auth/login`  
+  Authenticate with `email` and `password` and receive `access_token` (JWT).  
+  Common errors: `400` invalid input, `401` wrong credentials.
+
+### Users
+
+- `GET /users/:id`  
+  Fetch a public profile by user ID. Returns `id`, `username`, `email`, `created_at`, plus `threadCount` and `recentThreads` (latest 5).  
+  Common errors: `404` user not found.
+
+### Threads
+
+- `GET /threads`  
+  List all threads. Response includes `meta.total`.
+
+- `GET /threads/my-threads` (auth)  
+  List threads created by the current user. Response includes `meta.total`.
+
+- `GET /threads/:id`  
+  Get a single thread by ID.  
+  Common errors: `404` thread not found.
+
+- `POST /threads` (auth)  
+  Create a thread with `title` (min 5) and `content` (min 10).  
+  Common errors: `400` invalid input, `401` missing/invalid token.
+
+- `PUT /threads/:id` (auth, owner only)  
+  Update a thread with `title` and `content`.  
+  Common errors: `400` invalid input, `401` missing/invalid token, `403` not owner, `404` not found.
+
+- `DELETE /threads/:id` (auth, owner only)  
+  Delete a thread.  
+  Common errors: `401` missing/invalid token, `403` not owner, `404` not found.
+
+### Replies
+
+- `GET /threads/:threadId/replies`  
+  List replies for a thread. Response includes `meta.total`.  
+  Common errors: `404` thread not found.
+
+- `POST /threads/:threadId/replies` (auth)  
+  Add a reply with `content` (min 5).  
+  Common errors: `400` invalid input, `401` missing/invalid token, `404` thread not found.
+
+- `DELETE /replies/:id` (auth, owner only)  
+  Delete a reply.  
+  Common errors: `401` missing/invalid token, `403` not owner, `404` reply not found.
+
 ## Screenshot
 
 ### API documentation in Swagger UI
