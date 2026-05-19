@@ -1,20 +1,20 @@
 # Q&A Forum API (NestJS)
 
 Backend service for a simple Q&A forum. Provides authentication, user profiles,
-thread creation, and replies with a documented REST API.
+thread creation, and replies, with a documented REST API.
 
 ## Features
 
 - JWT-based auth (register/login)
-- Thread and reply management
+- Threads and replies API
 - User profiles
-- Validation plus Swagger/OpenAPI docs
+- Validation and Swagger/OpenAPI docs
 
 ## Tech stack
 
 - NestJS + TypeScript
 - PostgreSQL + TypeORM
-- Passport JWT
+- JWT (passport-jwt)
 - Swagger UI
 
 ## Requirements
@@ -26,7 +26,7 @@ thread creation, and replies with a documented REST API.
 
 Create a `.env` file in this folder:
 
-```env
+```bash
 DATABASE_URL=postgres://user:password@localhost:5432/forum
 JWT_SECRET=your-secret
 JWT_EXPIRES_IN=7d
@@ -50,10 +50,37 @@ npm run start:dev
 npm run start:prod
 ```
 
-## Access
+API base path: `http://localhost:3000/api`
+Swagger docs: `http://localhost:3000/api/docs`
 
-- API base path: http://localhost:3000/api
-- Swagger docs: http://localhost:3000/api/docs
+## Screenshot
+
+### API documentation in Swagger UI
+
+![Screenshot of Swagger UI showing API documentation](images/image.png)
+
+### User 
+![Screenshot of GET request /api/users/{id}](images/image1.png)
+
+### Authentication
+
+![Screenshot of POST request /api/auth/register](images/image2.png)
+![Screenshot of POST request /api/auth/login](images/image3.png)
+
+### Threads
+
+![Screenshot of GET request /api/threads](images/image4.png)
+![Screenshot of POST request /api/threads](images/image5.png)
+![Screenshot of GET request /api/threads/my-threads](images/image6.png) 
+![Screenshot of GET request /api/threads/{id}](images/image7.png)
+![Screenshot of PUT request /api/threads/{id}](images/image8.png)
+![Screenshot of DELETE request /api/threads/{id}](images/image9.png)
+
+### Replies
+
+![Screenshot of GET request /api/threads/{threadId}/replies](images/image10.png)
+![Screenshot of POST request /api/threads/{threadId}/replies](images/image11.png)
+![Screenshot of DELETE request /api/replies/{id}](images/image12.png)
 
 ## Useful scripts
 
@@ -65,22 +92,6 @@ npm run test:e2e
 npm run test:cov
 npm run seed
 ```
-
-## Screenshots
-
-<details>
-<summary>Swagger UI and sample endpoints</summary>
-
-![Screenshot of Swagger UI showing API documentation](images/image.png)
-![Screenshot of GET request /api/users/{id}](images/image1.png)
-![Screenshot of POST request /api/auth/register](images/image2.png)
-![Screenshot of POST request /api/auth/login](images/image3.png)
-![Screenshot of GET request /api/threads](images/image4.png)
-![Screenshot of POST request /api/threads](images/image5.png)
-![Screenshot of GET request /api/threads/my-threads](images/image6.png)
-![Screenshot of GET request /api/threads/{id}](images/image7.png)
-
-</details>
 
 ## Notes
 
